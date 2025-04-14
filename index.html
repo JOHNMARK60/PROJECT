@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - File Management System</title>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="assets/styles/style.min.css">
+    <link rel="stylesheet" href="assets/fonts/material-design/css/materialdesignicons.css">
+    <link rel="stylesheet" href="assets/plugin/mCustomScrollbar/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" href="assets/plugin/waves/waves.min.css">
+    <link rel="stylesheet" href="assets/plugin/sweet-alert/sweetalert.css">
+    <link rel="stylesheet" href="assets/plugin/percircle/css/percircle.css">
+    <link rel="stylesheet" href="assets/plugin/chart/chartist/chartist.min.css">
+    <link rel="stylesheet" href="assets/plugin/fullcalendar/fullcalendar.min.css">
+    <link rel="stylesheet" href="assets/plugin/fullcalendar/fullcalendar.print.css" media='print'>
+    <link rel="stylesheet" href="assets/color-switcher/color-switcher.min.css">
+
+    <!-- Inline CSS for user menu -->
+    <style>
+        .user-menu-wrapper {
+            margin-right: 20px;
+            position: relative;
+        }
+        .user-icon {
+            display: inline-block;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+        .dropdown-menu {
+            min-width: 180px;
+        }
+        .dropdown-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="main-menu">
+    <header class="header">
+        <a href="index.php" class="logo">File Manager</a>
+        <button type="button" class="button-close fa fa-times js__menu_close"></button>
+    </header>
+    <div class="content">
+        <div class="navigation">
+            <ul class="menu js__accordion">
+                <li class="current">
+                    <a class="waves-effect" href="index.php">
+                        <i class="menu-icon mdi mdi-view-dashboard"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="waves-effect parent-item js__control" href="#">
+                        <i class="menu-icon mdi mdi-buffer"></i>
+                        <span>Upload File</span>
+                        <span class="menu-arrow fa fa-angle-down"></span>
+                    </a>
+                    <ul class="sub-menu js__content">
+                        <li><a href="upload.html">Upload New File</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="waves-effect" href="files.html">
+                        <i class="menu-icon mdi mdi-table"></i>
+                        <span>File List</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Navbar -->
+<div class="fixed-navbar">
+    <div class="pull-left">
+        <button type="button" class="menu-mobile-button glyphicon glyphicon-menu-hamburger js__menu_mobile"></button>
+        <h1 class="page-title">File Management</h1>
+    </div>
+
+    <!-- 👇 User Dropdown Menu -->
+    <div class="pull-right user-menu-wrapper">
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle user-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img src="assets/images/icon.png" alt="User Avatar" class="user-avatar">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <li><a href="#"><i class="mdi mdi-account"></i> John Mark Yecyec</a></li>
+                <li><a href="dashboard.php"><i class="mdi mdi-view-dashboard"></i> Dashboard</a></li>
+                <li><a href="profile.php"><i class="mdi mdi-account-box"></i> Profile</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="logout.php"><i class="mdi mdi-logout"></i> Log out</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div id="wrapper">
+    <div class="main-content">
+        <div class="row small-spacing">
+
+            <!-- Upload Box -->
+            <div class="col-md-8 col-xs-12">
+                <div class="box-content">
+                    <h4 class="box-title">Upload New File</h4>
+                    <p>To upload a file, choose the file from your computer and click the upload button. Supported file types include PDF, DOCX, TXT, and image files (JPEG, PNG, GIF).</p>
+
+                    <!-- Upload Form -->
+                    <form action="upload.php" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="fileUpload">Select File</label>
+                            <input type="file" name="fileToUpload" id="fileUpload" class="form-control" required>
+                        </div>
+                        <button type="submit" name="submit" class="btn btn-primary">Upload File</button>
+                    </form>
+
+                    <hr>
+
+                    <h4 class="box-title">Uploaded Files</h4>
+                    <p>Here is a list of all files uploaded by users:</p>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Size</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $dir = "uploads/";
+                            $totalSize = 0;
+
+                            if (is_dir($dir)) {
+                                $files = array_diff(scandir($dir), array('.', '..'));
+
+                                if (count($files) > 0) {
+                                    foreach ($files as $file) {
+                                        $size = filesize($dir . $file);
+                                        $totalSize += $size;
+
+                                        echo "<tr>";
+                                        echo "<td>" . htmlspecialchars($file) . "</td>";
+                                        echo "<td>" . round($size / 1024, 2) . " KB</td>";
+                                        echo "<td><a href='$dir$file' download class='btn btn-sm btn-primary'>Download</a></td>";
+                                        echo "</tr>";
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='3'>No files uploaded yet.</td></tr>";
+                                }
+                            } else {
+                                echo "<tr><td colspan='3'>Upload directory not found.</td></tr>";
+                            }
+
+                            $usedMB = round($totalSize / (1024 * 1024), 2); // in MB
+                            $percent = min(round(($usedMB / 1024) * 100), 100); // max 100%
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Storage Widget -->
+            <div class="col-md-4 col-xs-12">
+                <div class="box-content text-center">
+                    <h4 class="box-title">Storage Usage</h4>
+                    <div id="storageCircle" class="c100 small p<?php echo $percent; ?>">
+                        <span><?php echo $percent; ?>%</span>
+                        <div class="slice">
+                            <div class="bar"></div>
+                            <div class="fill"></div>
+                        </div>
+                    </div>
+                    <p><?php echo $usedMB; ?> MB of 1024 MB used</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <ul class="list-inline">
+                <li>2025 © File Manager.</li>
+                <li><a href="#">Privacy</a></li>
+                <li><a href="#">Terms</a></li>
+                <li><a href="#">Help</a></li>
+            </ul>
+        </footer>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="assets/scripts/jquery.min.js"></script>
+<script src="assets/scripts/modernizr.min.js"></script>
+<script src="assets/plugin/bootstrap/js/bootstrap.min.js"></script>
+<script src="assets/plugin/mCustomScrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+<script src="assets/plugin/nprogress/nprogress.js"></script>
+<script src="assets/plugin/sweet-alert/sweetalert.min.js"></script>
+<script src="assets/plugin/waves/waves.min.js"></script>
+<script src="assets/plugin/fullscreen/jquery.fullscreen-min.js"></script>
+<script src="assets/plugin/chart/chartjs/Chart.bundle.min.js"></script>
+<script src="assets/scripts/chart.chartjs.init.min.js"></script>
+<script src="assets/plugin/moment/moment.js"></script>
+<script src="assets/plugin/fullcalendar/fullcalendar.min.js"></script>
+<script src="assets/scripts/fullcalendar.init.js"></script>
+<script src="assets/plugin/chart/sparkline/jquery.sparkline.min.js"></script>
+<script src="assets/scripts/chart.sparkline.init.min.js"></script>
+<script src="assets/scripts/main.min.js"></script>
+<script src="assets/color-switcher/color-switcher.min.js"></script>
+
+</body>
+</html>
